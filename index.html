@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HouseSeekr – Asuncion Property Market Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">🏠</span>
+        <span class="logo-text">HouseSeekr</span>
+      </div>
+      <p class="header-subtitle">Asuncion Property Market Map</p>
+    </div>
+  </header>
+
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="filters">
+        <h2 class="filters-title">Filters</h2>
+
+        <label class="filter-label">Property Type</label>
+        <div class="checkbox-group" id="type-filters">
+          <label><input type="checkbox" value="house" checked /> House</label>
+          <label><input type="checkbox" value="apartment" checked /> Apartment</label>
+          <label><input type="checkbox" value="land" checked /> Land</label>
+          <label><input type="checkbox" value="commercial" checked /> Commercial</label>
+        </div>
+
+        <label class="filter-label">Listing Type</label>
+        <div class="checkbox-group" id="listing-filters">
+          <label><input type="checkbox" value="sale" checked /> For Sale</label>
+          <label><input type="checkbox" value="rent" checked /> For Rent</label>
+        </div>
+
+        <label class="filter-label">Max Price (USD)</label>
+        <input type="range" id="price-range" min="0" max="500000" step="5000" value="500000" />
+        <div class="range-value">Up to <span id="price-display">$500,000</span></div>
+
+        <label class="filter-label">Min Bedrooms</label>
+        <select id="bedroom-filter">
+          <option value="0">Any</option>
+          <option value="1">1+</option>
+          <option value="2">2+</option>
+          <option value="3">3+</option>
+          <option value="4">4+</option>
+        </select>
+
+        <button class="btn-reset" id="reset-filters">Reset Filters</button>
+      </div>
+
+      <div class="stats-panel">
+        <h3 class="stats-title">Market Summary</h3>
+        <div class="stat">
+          <span class="stat-label">Listings shown</span>
+          <span class="stat-value" id="stat-count">0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Avg. price (sale)</span>
+          <span class="stat-value" id="stat-avg-sale">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Avg. rent / mo.</span>
+          <span class="stat-value" id="stat-avg-rent">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Cheapest listing</span>
+          <span class="stat-value" id="stat-min">—</span>
+        </div>
+      </div>
+
+      <div class="listing-list" id="listing-list"></div>
+    </aside>
+
+    <!-- Map -->
+    <main class="map-container">
+      <div id="map"></div>
+    </main>
+  </div>
+
+  <!-- Property detail modal -->
+  <div class="modal-backdrop" id="modal-backdrop">
+    <div class="modal" id="property-modal">
+      <button class="modal-close" id="modal-close">&times;</button>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
