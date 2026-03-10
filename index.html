@@ -3,77 +3,107 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HouseSeekr – Asuncion Property Market Map</title>
+  <title>HouseSeekr – Asunción Property Market Map</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header class="site-header">
     <div class="header-inner">
-      <div class="logo">
-        <span class="logo-icon">🏠</span>
+      <a class="logo" href="#">
+        <div class="logo-mark">🏠</div>
         <span class="logo-text">HouseSeekr</span>
-      </div>
-      <p class="header-subtitle">Asuncion Property Market Map</p>
+      </a>
+      <span class="logo-location">📍 Asunción, Paraguay</span>
     </div>
   </header>
 
   <div class="app-layout">
     <!-- Sidebar -->
     <aside class="sidebar">
+
+      <!-- Filters -->
       <div class="filters">
-        <h2 class="filters-title">Filters</h2>
-
-        <label class="filter-label">Property Type</label>
-        <div class="checkbox-group" id="type-filters">
-          <label><input type="checkbox" value="house" checked /> House</label>
-          <label><input type="checkbox" value="apartment" checked /> Apartment</label>
-          <label><input type="checkbox" value="land" checked /> Land</label>
-          <label><input type="checkbox" value="commercial" checked /> Commercial</label>
+        <div class="filters-header">
+          <h2 class="filters-title">Filters</h2>
+          <button class="btn-clear" id="reset-filters">× Clear</button>
         </div>
 
-        <label class="filter-label">Listing Type</label>
-        <div class="checkbox-group" id="listing-filters">
-          <label><input type="checkbox" value="sale" checked /> For Sale</label>
-          <label><input type="checkbox" value="rent" checked /> For Rent</label>
+        <!-- Property type -->
+        <div class="filter-section">
+          <span class="filter-label">Property Type</span>
+          <div class="pill-group" id="type-filters">
+            <button class="pill active" data-value="house">🏡 House</button>
+            <button class="pill active" data-value="apartment">🏢 Apt</button>
+            <button class="pill active" data-value="land">🌿 Land</button>
+            <button class="pill active" data-value="commercial">🏪 Commercial</button>
+          </div>
         </div>
 
-        <label class="filter-label">Max Price (USD)</label>
-        <input type="range" id="price-range" min="0" max="500000" step="5000" value="500000" />
-        <div class="range-value">Up to <span id="price-display">$500,000</span></div>
+        <!-- Listing type -->
+        <div class="filter-section">
+          <span class="filter-label">Listing Type</span>
+          <div class="pill-group" id="listing-filters">
+            <button class="pill active" data-value="sale">For Sale</button>
+            <button class="pill active rent-pill" data-value="rent">For Rent</button>
+          </div>
+        </div>
 
-        <label class="filter-label">Min Bedrooms</label>
-        <select id="bedroom-filter">
-          <option value="0">Any</option>
-          <option value="1">1+</option>
-          <option value="2">2+</option>
-          <option value="3">3+</option>
-          <option value="4">4+</option>
-        </select>
+        <!-- Price range -->
+        <div class="filter-section">
+          <div class="price-range-wrap">
+            <div class="range-header">
+              <span class="range-heading">Max Price (USD)</span>
+              <span class="range-val" id="price-display">$500,000+</span>
+            </div>
+            <input type="range" id="price-range" min="0" max="500000" step="5000" value="500000" />
+          </div>
+        </div>
 
-        <button class="btn-reset" id="reset-filters">Reset Filters</button>
+        <!-- Bedrooms -->
+        <div class="filter-section">
+          <span class="filter-label">Min Bedrooms</span>
+          <div class="pill-group" id="bedroom-pills">
+            <button class="pill active" data-value="0">Any</button>
+            <button class="pill" data-value="1">1+</button>
+            <button class="pill" data-value="2">2+</button>
+            <button class="pill" data-value="3">3+</button>
+            <button class="pill" data-value="4">4+</button>
+          </div>
+        </div>
       </div>
 
+      <!-- Market stats -->
       <div class="stats-panel">
-        <h3 class="stats-title">Market Summary</h3>
-        <div class="stat">
-          <span class="stat-label">Listings shown</span>
-          <span class="stat-value" id="stat-count">0</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Avg. price (sale)</span>
-          <span class="stat-value" id="stat-avg-sale">—</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Avg. rent / mo.</span>
-          <span class="stat-value" id="stat-avg-rent">—</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Cheapest listing</span>
-          <span class="stat-value" id="stat-min">—</span>
+        <h3 class="stats-title">Market Overview</h3>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">🏘</div>
+            <div class="stat-val" id="stat-count">0</div>
+            <div class="stat-lbl">Listings</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">💰</div>
+            <div class="stat-val" id="stat-avg-sale">—</div>
+            <div class="stat-lbl">Avg Sale</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📅</div>
+            <div class="stat-val" id="stat-avg-rent">—</div>
+            <div class="stat-lbl">Avg Rent/mo</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">⬇</div>
+            <div class="stat-val" id="stat-min">—</div>
+            <div class="stat-lbl">From</div>
+          </div>
         </div>
       </div>
 
+      <!-- Listing cards -->
       <div class="listing-list" id="listing-list"></div>
     </aside>
 
