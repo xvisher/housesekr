@@ -1,0 +1,12 @@
+{
+  "name": "housesekr-scraper",
+  "version": "1.0.0",
+  "description": "Scrapes real property listings from Paraguay real estate portals",
+  "main": "scrape.js",
+  "scripts": {
+    "scrape": "node scrape.js"
+  },
+  "dependencies": {
+    "playwright": "^1.41.0"
+  }
+}
