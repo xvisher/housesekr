@@ -14,6 +14,7 @@ const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
 const { getCoords } = require('./neighborhoods.js');
+const { enrichListings } = require('./enrich.js');
 
 // PYG → USD conversion rate (approximate)
 const PYG_TO_USD = 1 / 7700;
@@ -392,11 +393,14 @@ async function main() {
     process.exit(1);
   }
 
-  writeDataJs(deduped);
+  // AI enrichment: clean titles/descriptions, validate prices, drop junk
+  const enriched = await enrichListings(deduped);
+
+  writeDataJs(enriched);
 
   // Print sample
   console.log('\nSample listing:');
-  console.log(JSON.stringify(deduped[0], null, 2));
+  console.log(JSON.stringify(enriched[0], null, 2));
 }
 
 main().catch(e => {
