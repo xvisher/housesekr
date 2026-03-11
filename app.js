@@ -1,4 +1,4 @@
-/* HouseSeekr – Asuncion Property Market Map */
+/* HouseSeekr – Paraguay Property Market Map */
 
 // ── Gradients per property type ───────────────────────────────────────────────
 const TYPE_GRADIENT = {
@@ -10,8 +10,8 @@ const TYPE_GRADIENT = {
 
 // ── Map init ──────────────────────────────────────────────────────────────────
 const map = L.map('map', {
-  center: [-25.2867, -57.5759],
-  zoom: 13,
+  center: [-25.32, -57.50],
+  zoom: 11,
   zoomControl: true
 });
 
@@ -60,16 +60,74 @@ function getPillValue(containerId) {
   return document.querySelector(`#${containerId} .pill.active`)?.dataset.value ?? '0';
 }
 
+// ── City filter – built dynamically ──────────────────────────────────────────
+function buildCityFilter() {
+  const container = document.getElementById('city-filters');
+  if (!container) return;
+
+  // Collect unique cities from data, preserve insertion order
+  const cities = [...new Set(PROPERTIES.map(p => p.city || 'Asunción'))];
+
+  cities.forEach(city => {
+    const btn = document.createElement('button');
+    btn.className = 'pill active';
+    btn.dataset.value = city;
+    btn.textContent = city;
+    btn.addEventListener('click', () => {
+      btn.classList.toggle('active');
+      const active = container.querySelectorAll('.pill.active');
+      if (active.length === 0) btn.classList.add('active');
+      render();
+    });
+    container.appendChild(btn);
+  });
+}
+
+// ── Neighborhood price analysis ───────────────────────────────────────────────
+// Returns per-neighborhood and per-city average prices, computed once from all data.
+const _nbStats = (() => {
+  const nb   = {};
+  const city = {};
+  for (const p of PROPERTIES) {
+    const c = p.city || 'Asunción';
+    if (!nb[p.neighborhood]) nb[p.neighborhood] = { sale: [], rent: [] };
+    if (!city[c])            city[c]            = { sale: [], rent: [] };
+    nb[p.neighborhood][p.listing].push(p.price);
+    city[c][p.listing].push(p.price);
+  }
+  return { nb, city };
+})();
+
+function getPriceAnalysis(p) {
+  const nbPool   = _nbStats.nb[p.neighborhood]?.[p.listing] || [];
+  const cityPool = _nbStats.city[p.city || 'Asunción']?.[p.listing] || [];
+
+  // Prefer neighborhood pool if it has 2+ entries; fall back to city pool
+  const pool = nbPool.length >= 2 ? nbPool : cityPool.length >= 2 ? cityPool : null;
+  if (!pool) return null;
+
+  const avg    = pool.reduce((a, b) => a + b, 0) / pool.length;
+  const pct    = ((p.price - avg) / avg) * 100;
+  const label  = pct < -10 ? `${Math.abs(Math.round(pct))}% below avg`
+               : pct >  10 ? `${Math.round(pct)}% above avg`
+               : 'At market avg';
+  const type   = pct < -10 ? 'below' : pct > 10 ? 'above' : 'fair';
+  const icon   = pct < -10 ? '🟢' : pct > 10 ? '🔴' : '⚪';
+  return { label, type, icon, pct };
+}
+
 // ── Filter logic ──────────────────────────────────────────────────────────────
 function getFiltered() {
   const types    = getPillValues('type-filters');
   const listings = getPillValues('listing-filters');
+  const cities   = getPillValues('city-filters');
   const maxPrice = parseInt(priceRange.value, 10);
   const minBeds  = parseInt(getPillValue('bedroom-pills'), 10);
 
   return PROPERTIES.filter(p =>
     types.includes(p.type) &&
     listings.includes(p.listing) &&
+    cities.includes(p.city || 'Asunción') &&
     p.price <= maxPrice &&
     p.bedrooms >= minBeds
   );
@@ -77,15 +135,17 @@ function getFiltered() {
 
 // Show/hide the "× Clear" button based on whether defaults are active
 function updateClearBtn() {
-  const allTypes    = document.querySelectorAll('#type-filters .pill').length;
-  const activeTypes = document.querySelectorAll('#type-filters .pill.active').length;
-  const allListing  = document.querySelectorAll('#listing-filters .pill').length;
+  const allTypes      = document.querySelectorAll('#type-filters .pill').length;
+  const activeTypes   = document.querySelectorAll('#type-filters .pill.active').length;
+  const allListing    = document.querySelectorAll('#listing-filters .pill').length;
   const activeListing = document.querySelectorAll('#listing-filters .pill.active').length;
-  const bedroomVal  = getPillValue('bedroom-pills');
-  const priceVal    = parseInt(priceRange.value, 10);
+  const allCities     = document.querySelectorAll('#city-filters .pill').length;
+  const activeCities  = document.querySelectorAll('#city-filters .pill.active').length;
+  const bedroomVal    = getPillValue('bedroom-pills');
+  const priceVal      = parseInt(priceRange.value, 10);
 
   const isDefault = activeTypes === allTypes && activeListing === allListing
-    && bedroomVal === '0' && priceVal >= 500000;
+    && activeCities === allCities && bedroomVal === '0' && priceVal >= 500000;
 
   resetBtn.classList.toggle('visible', !isDefault);
 }
@@ -141,7 +201,7 @@ function buildPopupHtml(p) {
       <div class="popup-price">${formatPrice(p.price, p.listing)}</div>
       <div class="popup-title">${p.emoji} ${p.title}</div>
       <div class="popup-meta">
-        ${p.neighborhood}
+        ${p.neighborhood} · ${p.city || 'Asunción'}
         ${p.bedrooms > 0 ? ` · ${p.bedrooms} bd` : ''}
         ${p.area ? ` · ${p.area} m²` : ''}
       </div>
@@ -183,21 +243,33 @@ function renderList(filtered) {
     card.dataset.id = p.id;
 
     const gradient = TYPE_GRADIENT[p.type] || TYPE_GRADIENT.house;
+    const hasImage = p.images && p.images.length > 0;
+    const analysis = getPriceAnalysis(p);
+
+    const heroContent = hasImage
+      ? `<img src="${p.images[0]}" alt="${p.title}" loading="lazy" />`
+      : p.emoji;
+
+    const badgeHtml = analysis
+      ? `<div class="price-badge badge-${analysis.type}">${analysis.icon} ${analysis.label}</div>`
+      : '';
 
     card.innerHTML = `
-      <div class="card-hero" style="background:${gradient}">
-        ${p.emoji}
+      <div class="card-hero" style="${hasImage ? '' : `background:${gradient}`}">
+        ${heroContent}
         <span class="card-hero-badge badge-${p.listing}">
           ${p.listing === 'sale' ? 'For Sale' : 'For Rent'}
         </span>
       </div>
       <div class="card-body">
         <div class="card-price">${formatPrice(p.price, p.listing)}</div>
+        ${badgeHtml}
         <div class="card-title">${p.title} · ${p.neighborhood}</div>
         <div class="card-chips">
           ${p.bedrooms > 0 ? `<span class="card-chip">🛏 ${p.bedrooms}</span>` : ''}
           ${p.bathrooms > 0 ? `<span class="card-chip">🚿 ${p.bathrooms}</span>` : ''}
           ${p.area > 0 ? `<span class="card-chip">📐 ${p.area} m²</span>` : ''}
+          <span class="card-chip">📍 ${p.city || 'Asunción'}</span>
         </div>
       </div>
     `;
@@ -234,26 +306,62 @@ function openModal(id) {
   const p = PROPERTIES.find(x => x.id === id);
   if (!p) return;
 
-  const gradient = TYPE_GRADIENT[p.type] || TYPE_GRADIENT.house;
+  const gradient  = TYPE_GRADIENT[p.type] || TYPE_GRADIENT.house;
+  const hasImages = p.images && p.images.length > 0;
+  const analysis  = getPriceAnalysis(p);
+  const contact   = p.contact || {};
+
+  // Hero: image gallery or gradient
+  const heroHtml = hasImages
+    ? `<div class="modal-images">${p.images.map(src =>
+        `<img src="${src}" alt="${p.title}" loading="lazy" />`
+      ).join('')}</div>`
+    : `<div class="modal-hero" style="background:${gradient}">
+        ${p.emoji}
+        <span class="modal-hero-badge badge-${p.listing}">
+          ${p.listing === 'sale' ? 'For Sale' : 'For Rent'}
+        </span>
+      </div>`;
+
+  // Price analysis badge
+  const priceBadgeHtml = analysis
+    ? `<span class="modal-price-badge badge-${analysis.type}">${analysis.icon} ${analysis.label}</span>`
+    : '';
+
+  // Contact block
+  const contactHtml = (contact.agent || contact.phone)
+    ? `<div class="modal-section-label">Contact</div>
+       <div class="modal-contact">
+         <div class="contact-avatar">${contact.agent ? contact.agent[0].toUpperCase() : '?'}</div>
+         <div class="contact-info">
+           ${contact.agent ? `<div class="contact-agent">${contact.agent}</div>` : ''}
+           ${contact.phone ? `<div class="contact-phone">+${contact.phone}</div>` : ''}
+         </div>
+         ${contact.phone
+           ? `<a class="contact-btn" href="https://wa.me/${contact.phone}?text=Hola,%20vi%20la%20propiedad%20${encodeURIComponent(p.title)}%20en%20HouseSeekr" target="_blank" rel="noopener">
+               💬 WhatsApp
+             </a>`
+           : ''}
+       </div>`
+    : '';
 
   modalBody.innerHTML = `
-    <div class="modal-hero" style="background:${gradient}">
-      ${p.emoji}
-      <span class="modal-hero-badge badge-${p.listing}">
-        ${p.listing === 'sale' ? 'For Sale' : 'For Rent'}
-      </span>
-    </div>
+    ${heroHtml}
     <div class="modal-inner">
-      <div class="modal-price">${formatPrice(p.price, p.listing)}</div>
+      <div class="modal-price-row">
+        <div class="modal-price">${formatPrice(p.price, p.listing)}</div>
+        ${priceBadgeHtml}
+      </div>
       <h2 class="modal-title">${p.title}</h2>
-      <p class="modal-neighborhood">📍 ${p.neighborhood}, Asunción</p>
+      <p class="modal-neighborhood">📍 ${p.neighborhood}, ${p.city || 'Asunción'}, Paraguay</p>
       <div class="modal-specs">
-        ${p.bedrooms > 0 ? `<div class="spec-box"><div class="spec-icon">🛏</div><div class="spec-value">${p.bedrooms}</div><div class="spec-label">Bedrooms</div></div>` : ''}
+        ${p.bedrooms  > 0 ? `<div class="spec-box"><div class="spec-icon">🛏</div><div class="spec-value">${p.bedrooms}</div><div class="spec-label">Bedrooms</div></div>` : ''}
         ${p.bathrooms > 0 ? `<div class="spec-box"><div class="spec-icon">🚿</div><div class="spec-value">${p.bathrooms}</div><div class="spec-label">Bathrooms</div></div>` : ''}
-        ${p.area > 0 ? `<div class="spec-box"><div class="spec-icon">📐</div><div class="spec-value">${p.area}</div><div class="spec-label">m²</div></div>` : ''}
+        ${p.area      > 0 ? `<div class="spec-box"><div class="spec-icon">📐</div><div class="spec-value">${p.area}</div><div class="spec-label">m²</div></div>` : ''}
       </div>
       ${p.description ? `<div class="modal-section-label">Description</div><p class="modal-desc">${p.description}</p>` : ''}
       ${p.tags?.length ? `<div class="modal-section-label">Features</div><div class="modal-tags">${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>` : ''}
+      ${contactHtml}
     </div>
   `;
 
@@ -316,7 +424,7 @@ priceRange.addEventListener('input', () => {
 
 // Reset / Clear
 resetBtn.addEventListener('click', () => {
-  document.querySelectorAll('#type-filters .pill, #listing-filters .pill')
+  document.querySelectorAll('#type-filters .pill, #listing-filters .pill, #city-filters .pill')
     .forEach(p => p.classList.add('active'));
   document.querySelectorAll('#bedroom-pills .pill')
     .forEach((p, i) => p.classList.toggle('active', i === 0));
@@ -327,4 +435,5 @@ resetBtn.addEventListener('click', () => {
 });
 
 // ── Initial render ────────────────────────────────────────────────────────────
+buildCityFilter();
 render();

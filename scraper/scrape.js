@@ -56,12 +56,16 @@ async function scrapeInfocasas(browser) {
   await page.setExtraHTTPHeaders({ 'Accept-Language': 'es-PY,es;q=0.9' });
 
   const sections = [
-    { url: 'https://www.infocasas.com.py/venta/asuncion', listing: 'sale' },
-    { url: 'https://www.infocasas.com.py/alquiler/asuncion', listing: 'rent' },
+    { url: 'https://www.infocasas.com.py/venta/asuncion',  listing: 'sale', city: 'Asunción' },
+    { url: 'https://www.infocasas.com.py/alquiler/asuncion', listing: 'rent', city: 'Asunción' },
+    { url: 'https://www.infocasas.com.py/venta/capiata',   listing: 'sale', city: 'Capiatá' },
+    { url: 'https://www.infocasas.com.py/alquiler/capiata', listing: 'rent', city: 'Capiatá' },
+    { url: 'https://www.infocasas.com.py/venta/aregua',    listing: 'sale', city: 'Areguá' },
+    { url: 'https://www.infocasas.com.py/alquiler/aregua', listing: 'rent', city: 'Areguá' },
   ];
 
-  for (const { url, listing } of sections) {
-    console.log(`  [Infocasas] Scraping ${listing}: ${url}`);
+  for (const { url, listing, city } of sections) {
+    console.log(`  [Infocasas] Scraping ${city} ${listing}: ${url}`);
     try {
       await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
       await sleep(2000);
@@ -79,18 +83,27 @@ async function scrapeInfocasas(browser) {
           const beds = el.querySelector('[class*="bed"], [class*="dorm"], [class*="habitacion"]')?.innerText?.trim() || '';
           const baths = el.querySelector('[class*="bath"], [class*="baño"]')?.innerText?.trim() || '';
           const area = el.querySelector('[class*="area"], [class*="superficie"], [class*="m2"]')?.innerText?.trim() || '';
-          return { title, price, neighborhood, beds, baths, area, link, text: text.slice(0, 300) };
+          const imgEl = el.querySelector('img[src]');
+          const image = imgEl?.src?.startsWith('http') ? imgEl.src : (imgEl?.dataset?.src?.startsWith('http') ? imgEl.dataset.src : '');
+          const agentEl = el.querySelector('[class*="agent"], [class*="agente"], [class*="broker"], [class*="asesor"]');
+          const phoneEl = el.querySelector('[class*="phone"], [class*="telefono"], [class*="whatsapp"], [class*="cel"]');
+          const contact = {
+            agent: agentEl?.innerText?.trim() || '',
+            phone: phoneEl?.innerText?.replace(/\D/g, '').slice(0, 15) || '',
+          };
+          return { title, price, neighborhood, beds, baths, area, link, image, contact, text: text.slice(0, 300) };
         })
       );
 
       for (const c of cards) {
         if (!c.title && !c.price) continue;
         const type = guessType(c.title, c.text);
-        const coords = getCoords(c.neighborhood);
+        const coords = getCoords(c.neighborhood || city);
         results.push({
           source: 'Infocasas',
-          title: c.title || `${type} en ${c.neighborhood || 'Asunción'}`,
-          neighborhood: c.neighborhood || 'Asunción',
+          title: c.title || `${type} en ${c.neighborhood || city}`,
+          neighborhood: c.neighborhood || city,
+          city,
           type,
           listing,
           rawPrice: c.price,
@@ -101,6 +114,8 @@ async function scrapeInfocasas(browser) {
           lng: coords.lng,
           description: c.text.split('\n').slice(0, 3).join(' ').trim(),
           tags: [],
+          images: c.image ? [c.image] : [],
+          contact: c.contact,
           link: c.link,
         });
       }
@@ -136,13 +151,17 @@ async function scrapeRemax(browser) {
   });
 
   const sections = [
-    { url: 'https://www.remax.com.py/publicaciones/comprar?ubicacion=asuncion', listing: 'sale' },
-    { url: 'https://www.remax.com.py/publicaciones/alquilar?ubicacion=asuncion', listing: 'rent' },
+    { url: 'https://www.remax.com.py/publicaciones/comprar?ubicacion=asuncion',  listing: 'sale', city: 'Asunción' },
+    { url: 'https://www.remax.com.py/publicaciones/alquilar?ubicacion=asuncion', listing: 'rent', city: 'Asunción' },
+    { url: 'https://www.remax.com.py/publicaciones/comprar?ubicacion=capiata',   listing: 'sale', city: 'Capiatá' },
+    { url: 'https://www.remax.com.py/publicaciones/alquilar?ubicacion=capiata',  listing: 'rent', city: 'Capiatá' },
+    { url: 'https://www.remax.com.py/publicaciones/comprar?ubicacion=aregua',    listing: 'sale', city: 'Areguá' },
+    { url: 'https://www.remax.com.py/publicaciones/alquilar?ubicacion=aregua',   listing: 'rent', city: 'Areguá' },
   ];
 
-  for (const { url, listing } of sections) {
+  for (const { url, listing, city } of sections) {
     apiData.length = 0;
-    console.log(`  [RE/MAX] Scraping ${listing}: ${url}`);
+    console.log(`  [RE/MAX] Scraping ${city} ${listing}: ${url}`);
     try {
       await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
       await sleep(3000);
@@ -152,17 +171,22 @@ async function scrapeRemax(browser) {
         for (const batch of apiData) {
           const items = batch.data || batch.results || batch.items || (Array.isArray(batch) ? batch : []);
           for (const item of items) {
-            const neighborhood = item.neighborhood || item.barrio || item.city || item.ciudad || '';
+            const neighborhood = item.neighborhood || item.barrio || item.city || item.ciudad || city;
             const coords = getCoords(neighborhood);
             const typeRaw = (item.type || item.tipo || item.propertyType || '').toLowerCase();
             const type = typeRaw.includes('apart') ? 'apartment'
               : typeRaw.includes('terreno') || typeRaw.includes('lote') ? 'land'
               : typeRaw.includes('comercial') || typeRaw.includes('local') ? 'commercial'
               : 'house';
+            const rawImages = item.images || item.fotos || item.photos || [];
+            const images = Array.isArray(rawImages)
+              ? rawImages.map(i => (typeof i === 'string' ? i : i.url || i.src || '')).filter(Boolean)
+              : (item.image || item.foto ? [item.image || item.foto] : []);
             results.push({
               source: 'RE/MAX',
               title: item.title || item.titulo || `${type} en ${neighborhood}`,
               neighborhood,
+              city,
               type,
               listing,
               rawPrice: String(item.price || item.precio || ''),
@@ -173,6 +197,11 @@ async function scrapeRemax(browser) {
               lng: parseFloat(item.lng || item.longitude || coords.lng) || coords.lng,
               description: item.description || item.descripcion || '',
               tags: Array.isArray(item.amenities) ? item.amenities : [],
+              images,
+              contact: {
+                agent: item.agent?.name || item.agente?.nombre || item.broker?.name || '',
+                phone: item.agent?.phone || item.agente?.telefono || item.phone || '',
+              },
               link: item.url || item.link || '',
             });
           }
@@ -182,24 +211,34 @@ async function scrapeRemax(browser) {
         // Fallback: DOM scraping
         const cards = await page.$$eval(
           '[class*="listing"], [class*="property"], [class*="card"], [class*="result"]',
-          (els) => els.slice(0, 50).map(el => ({
-            title: el.querySelector('h2,h3,[class*="title"]')?.innerText?.trim() || '',
-            price: el.querySelector('[class*="price"],[class*="precio"]')?.innerText?.trim() || '',
-            neighborhood: el.querySelector('[class*="location"],[class*="barrio"],[class*="neighborhood"]')?.innerText?.trim() || '',
-            beds: el.querySelector('[class*="bed"],[class*="dorm"]')?.innerText?.trim() || '',
-            baths: el.querySelector('[class*="bath"],[class*="bano"]')?.innerText?.trim() || '',
-            area: el.querySelector('[class*="area"],[class*="m2"]')?.innerText?.trim() || '',
-            text: (el.innerText || '').slice(0, 200),
-          }))
+          (els) => els.slice(0, 50).map(el => {
+            const imgEl = el.querySelector('img[src]');
+            const image = imgEl?.src?.startsWith('http') ? imgEl.src : '';
+            return {
+              title: el.querySelector('h2,h3,[class*="title"]')?.innerText?.trim() || '',
+              price: el.querySelector('[class*="price"],[class*="precio"]')?.innerText?.trim() || '',
+              neighborhood: el.querySelector('[class*="location"],[class*="barrio"],[class*="neighborhood"]')?.innerText?.trim() || '',
+              beds: el.querySelector('[class*="bed"],[class*="dorm"]')?.innerText?.trim() || '',
+              baths: el.querySelector('[class*="bath"],[class*="bano"]')?.innerText?.trim() || '',
+              area: el.querySelector('[class*="area"],[class*="m2"]')?.innerText?.trim() || '',
+              text: (el.innerText || '').slice(0, 200),
+              image,
+              contact: {
+                agent: el.querySelector('[class*="agent"],[class*="agente"]')?.innerText?.trim() || '',
+                phone: el.querySelector('[class*="phone"],[class*="tel"],[class*="whatsapp"]')?.innerText?.replace(/\D/g, '').slice(0, 15) || '',
+              },
+            };
+          })
         );
         for (const c of cards) {
           if (!c.title && !c.price) continue;
           const type = guessType(c.title, c.text);
-          const coords = getCoords(c.neighborhood);
+          const coords = getCoords(c.neighborhood || city);
           results.push({
             source: 'RE/MAX',
-            title: c.title || `${type} en ${c.neighborhood || 'Asunción'}`,
-            neighborhood: c.neighborhood || 'Asunción',
+            title: c.title || `${type} en ${c.neighborhood || city}`,
+            neighborhood: c.neighborhood || city,
+            city,
             type,
             listing,
             rawPrice: c.price,
@@ -210,6 +249,8 @@ async function scrapeRemax(browser) {
             lng: coords.lng,
             description: c.text,
             tags: [],
+            images: c.image ? [c.image] : [],
+            contact: c.contact,
             link: '',
           });
         }
@@ -300,6 +341,7 @@ function normalize(raw) {
   return {
     title: raw.title,
     neighborhood: raw.neighborhood,
+    city: raw.city || 'Asunción',
     type: raw.type,
     listing: raw.listing,
     price,
@@ -311,6 +353,8 @@ function normalize(raw) {
     lng: raw.lng,
     description: raw.description || '',
     tags: raw.tags || [],
+    images: raw.images || [],
+    contact: raw.contact || {},
     emoji: EMOJI[raw.type] || '🏠',
     _source: raw.source,
     _link: raw.link,

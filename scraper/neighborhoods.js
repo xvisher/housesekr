@@ -33,6 +33,10 @@ const NEIGHBORHOOD_COORDS = {
   "Villa Elisa":         { lat: -25.3700, lng: -57.4900 },
   "Itauguá":             { lat: -25.3897, lng: -57.3560 },
   "Limpio":              { lat: -25.1700, lng: -57.4700 },
+  // Areguá & lake area
+  "Areguá":              { lat: -25.2963, lng: -57.4152 },
+  "Lago Ypacaraí":       { lat: -25.3100, lng: -57.3700 },
+  "San Bernardino":      { lat: -25.3375, lng: -57.3144 },
 };
 
 // Default fallback — city center of Asuncion

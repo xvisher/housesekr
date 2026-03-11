@@ -336,6 +336,72 @@ input[type=range] {
   background: var(--accent-light); color: var(--accent-dark); font-weight: 600;
 }
 
+/* ── Card hero image ── */
+.card-hero img {
+  width: 100%; height: 100%; object-fit: cover;
+  position: absolute; inset: 0;
+}
+.card-hero { position: relative; overflow: hidden; }
+
+/* ── Price badge ── */
+.price-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: .68rem; font-weight: 700;
+  padding: 3px 9px; border-radius: 99px;
+  margin-top: 6px;
+}
+.price-badge.badge-below  { background: #dcfce7; color: #15803d; }
+.price-badge.badge-above  { background: #fee2e2; color: #b91c1c; }
+.price-badge.badge-fair   { background: #f1f5f9; color: var(--muted); }
+
+/* ── Modal image gallery ── */
+.modal-images {
+  display: flex; gap: 6px; overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  border-radius: 16px 16px 0 0; overflow: hidden;
+}
+.modal-images img {
+  flex-shrink: 0; width: 100%; height: 220px;
+  object-fit: cover; scroll-snap-align: start;
+  border-radius: 0;
+}
+.modal-images:has(img:nth-child(2)) img { width: 85%; }
+
+/* ── Modal contact ── */
+.modal-contact {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--bg); border-radius: var(--radius-sm);
+  padding: 12px 14px; margin-top: 16px;
+}
+.contact-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--accent); color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0; font-weight: 700;
+}
+.contact-info { flex: 1; min-width: 0; }
+.contact-agent { font-size: .82rem; font-weight: 600; color: var(--text); }
+.contact-phone { font-size: .75rem; color: var(--muted); margin-top: 1px; }
+.contact-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: #25d366; color: white;
+  border: none; border-radius: var(--radius-sm);
+  font-size: .75rem; font-weight: 700; padding: 7px 12px;
+  cursor: pointer; text-decoration: none; white-space: nowrap;
+  transition: background .15s; font-family: inherit;
+}
+.contact-btn:hover { background: #1ebe5d; }
+
+/* ── Modal price badge ── */
+.modal-price-row { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+.modal-price-badge {
+  font-size: .78rem; font-weight: 700;
+  padding: 3px 10px; border-radius: 99px;
+}
+.modal-price-badge.badge-below { background: #dcfce7; color: #15803d; }
+.modal-price-badge.badge-above { background: #fee2e2; color: #b91c1c; }
+.modal-price-badge.badge-fair  { background: #f1f5f9; color: var(--muted); }
+
 /* ── Responsive ── */
 @media (max-width: 640px) {
   .sidebar {
