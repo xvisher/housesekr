@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HouseSeekr – Asunción Property Market Map</title>
+  <title>HouseSeekr – Paraguay Property Market Map</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -17,7 +17,7 @@
         <div class="logo-mark">🏠</div>
         <span class="logo-text">HouseSeekr</span>
       </a>
-      <span class="logo-location">📍 Asunción, Paraguay</span>
+      <span class="logo-location">📍 Asunción · Capiatá · Areguá</span>
     </div>
   </header>
 
@@ -30,6 +30,14 @@
         <div class="filters-header">
           <h2 class="filters-title">Filters</h2>
           <button class="btn-clear" id="reset-filters">× Clear</button>
+        </div>
+
+        <!-- City filter -->
+        <div class="filter-section">
+          <span class="filter-label">City</span>
+          <div class="pill-group" id="city-filters">
+            <!-- populated dynamically by app.js -->
+          </div>
         </div>
 
         <!-- Property type -->

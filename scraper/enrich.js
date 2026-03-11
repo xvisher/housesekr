@@ -22,11 +22,13 @@ const BATCH_SIZE = 20;
 
 // ─── Market context for Claude ───────────────────────────────────────────────
 
-const SYSTEM_PROMPT = `You are a real estate data quality expert specializing in the Asunción, Paraguay market.
+const SYSTEM_PROMPT = `You are a real estate data quality expert specializing in the Paraguay property market (Asunción, Capiatá, Areguá, and Greater Asunción metro).
 
 Your job: clean listing data and validate prices against current market benchmarks.
 
-## Asunción Market Benchmarks (USD)
+## Market Benchmarks by City (USD)
+
+### Asunción
 - House for sale:        $50,000 – $600,000  (typical $120k–$250k)
 - Apartment for sale:   $35,000 – $400,000  (typical $60k–$150k)
 - Land for sale:         $8,000 – $300,000
@@ -34,6 +36,18 @@ Your job: clean listing data and validate prices against current market benchmar
 - House for rent:           $350 – $3,000/mo (typical $500–$1,200)
 - Apartment for rent:       $200 – $2,000/mo (typical $400–$900)
 - Commercial for rent:      $300 – $5,000/mo
+
+### Capiatá (suburban, lower prices than Asunción)
+- House for sale:        $30,000 – $150,000  (typical $50k–$100k)
+- Apartment for sale:   $25,000 – $100,000  (typical $35k–$70k)
+- Land for sale:         $5,000 – $80,000
+- House for rent:           $250 – $700/mo   (typical $350–$550)
+- Apartment for rent:       $180 – $500/mo   (typical $250–$400)
+
+### Areguá (lakeside / scenic town, mid-range)
+- House for sale:        $40,000 – $200,000  (typical $70k–$130k, lakefront up to $200k)
+- Land for sale:         $10,000 – $100,000
+- House for rent:           $300 – $900/mo   (typical $400–$700)
 
 ## Your tasks for EACH listing
 
