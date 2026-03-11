@@ -88,7 +88,10 @@ const OUTPUT_SCHEMA = {
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function readDataJs() {
-  const code = fs.readFileSync(DATA_PATH, 'utf8');
+  const raw  = fs.readFileSync(DATA_PATH, 'utf8');
+  // vm.runInNewContext only exposes var (not const/let) on the sandbox,
+  // so strip declaration keywords to make PROPERTIES a global assignment.
+  const code = raw.replace(/^\s*(const|let|var)\s+/gm, '');
   const ctx  = {};
   vm.runInNewContext(code, ctx);
   return Array.isArray(ctx.PROPERTIES) ? ctx.PROPERTIES : [];
