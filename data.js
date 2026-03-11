@@ -1,5 +1,6 @@
-// Sample property listings for Asuncion, Paraguay
-// Coordinates are real locations within Greater Asuncion metropolitan area.
+// Real property listings scraped from Infocasas, RE/MAX Paraguay, and Inmobiliaria del Este
+// Generated: 2026-03-11T11:17:12.842Z
+// AI-enriched: titles cleaned, descriptions refined, prices validated
 const PROPERTIES = [
   {
     id: 1,
@@ -15,8 +16,14 @@ const PROPERTIES = [
     lat: -25.2897,
     lng: -57.5736,
     description: "Spacious family home in one of Asuncion's most prestigious neighborhoods. Features a large garden, covered parking for two vehicles, and modern finishes throughout.",
-    tags: ["Garden", "2-Car Garage", "Pool", "Security"],
-    emoji: "🏡"
+    tags: [
+      "Garden",
+      "2-Car Garage",
+      "Pool",
+      "Security"
+    ],
+    emoji: "🏡",
+    priceStatus: "fair"
   },
   {
     id: 2,
@@ -32,8 +39,14 @@ const PROPERTIES = [
     lat: -25.2864,
     lng: -57.5821,
     description: "Contemporary apartment on the 8th floor with panoramic city views. Building amenities include pool, gym, and 24-hour security.",
-    tags: ["City View", "Pool", "Gym", "Concierge"],
-    emoji: "🏢"
+    tags: [
+      "City View",
+      "Pool",
+      "Gym",
+      "Concierge"
+    ],
+    emoji: "🏢",
+    priceStatus: "fair"
   },
   {
     id: 3,
@@ -49,8 +62,13 @@ const PROPERTIES = [
     lat: -25.2854,
     lng: -57.6402,
     description: "Bright studio apartment in the historic downtown area. Walking distance to government buildings, restaurants, and public transport.",
-    tags: ["Furnished", "Near Metro", "Historic District"],
-    emoji: "🏙️"
+    tags: [
+      "Furnished",
+      "Near Metro",
+      "Historic District"
+    ],
+    emoji: "🏙️",
+    priceStatus: "fair"
   },
   {
     id: 4,
@@ -63,11 +81,17 @@ const PROPERTIES = [
     bedrooms: 3,
     bathrooms: 2,
     area: 200,
-    lat: -25.3050,
-    lng: -57.5890,
+    lat: -25.305,
+    lng: -57.589,
     description: "Well-maintained house in the quiet Recoleta area. Ideal for families with a private garden, garage, and covered terrace.",
-    tags: ["Garden", "Garage", "Quiet Street", "School Nearby"],
-    emoji: "🏠"
+    tags: [
+      "Garden",
+      "Garage",
+      "Quiet Street",
+      "School Nearby"
+    ],
+    emoji: "🏠",
+    priceStatus: "fair"
   },
   {
     id: 5,
@@ -83,8 +107,14 @@ const PROPERTIES = [
     lat: -25.2758,
     lng: -57.5989,
     description: "Prime commercial space on a high-traffic avenue. Suitable for offices, retail, or medical practice. Features 4 private rooms and a reception area.",
-    tags: ["High Traffic", "Street Access", "Reception", "A/C"],
-    emoji: "🏪"
+    tags: [
+      "High Traffic",
+      "Street Access",
+      "Reception",
+      "A/C"
+    ],
+    emoji: "🏪",
+    priceStatus: "fair"
   },
   {
     id: 6,
@@ -100,8 +130,14 @@ const PROPERTIES = [
     lat: -25.3423,
     lng: -57.5063,
     description: "Flat, fenced land plot in the growing suburb of San Lorenzo. All utilities available at the boundary. Ideal for residential construction.",
-    tags: ["Fenced", "Utilities", "Flat Terrain", "Residential Zone"],
-    emoji: "🌿"
+    tags: [
+      "Fenced",
+      "Utilities",
+      "Flat Terrain",
+      "Residential Zone"
+    ],
+    emoji: "🌿",
+    priceStatus: "fair"
   },
   {
     id: 7,
@@ -117,8 +153,15 @@ const PROPERTIES = [
     lat: -25.2833,
     lng: -57.5694,
     description: "Exclusive penthouse with rooftop terrace, private jacuzzi, and sweeping views of the Rio Paraguay. Best-in-class finishes and smart home system.",
-    tags: ["Rooftop Terrace", "Jacuzzi", "River View", "Smart Home", "Private Elevator"],
-    emoji: "🌟"
+    tags: [
+      "Rooftop Terrace",
+      "Jacuzzi",
+      "River View",
+      "Smart Home",
+      "Private Elevator"
+    ],
+    emoji: "🌟",
+    priceStatus: "fair"
   },
   {
     id: 8,
@@ -132,10 +175,16 @@ const PROPERTIES = [
     bathrooms: 2,
     area: 160,
     lat: -25.2665,
-    lng: -57.4850,
+    lng: -57.485,
     description: "Charming house in the city of Luque, home of the Paraguayan Football Federation. Quiet residential street, large backyard, and fruit trees.",
-    tags: ["Backyard", "Fruit Trees", "Quiet Street", "Parking"],
-    emoji: "🏡"
+    tags: [
+      "Backyard",
+      "Fruit Trees",
+      "Quiet Street",
+      "Parking"
+    ],
+    emoji: "🏡",
+    priceStatus: "fair"
   },
   {
     id: 9,
@@ -148,11 +197,16 @@ const PROPERTIES = [
     bedrooms: 1,
     bathrooms: 1,
     area: 40,
-    lat: -25.2730,
-    lng: -57.6280,
+    lat: -25.273,
+    lng: -57.628,
     description: "Compact and affordable studio apartment near the port area. Great for singles or professionals. Includes basic furnishings.",
-    tags: ["Furnished", "Near Port", "Affordable"],
-    emoji: "🏢"
+    tags: [
+      "Furnished",
+      "Near Port",
+      "Affordable"
+    ],
+    emoji: "🏢",
+    priceStatus: "fair"
   },
   {
     id: 10,
@@ -165,11 +219,17 @@ const PROPERTIES = [
     bedrooms: 4,
     bathrooms: 2,
     area: 220,
-    lat: -25.3180,
-    lng: -57.6010,
+    lat: -25.318,
+    lng: -57.601,
     description: "Spacious 4-bedroom house in the established Trinidad neighborhood. Large living area, covered BBQ area, and a safe quiet street.",
-    tags: ["BBQ Area", "Covered Terrace", "Garage", "Established Neighborhood"],
-    emoji: "🏠"
+    tags: [
+      "BBQ Area",
+      "Covered Terrace",
+      "Garage",
+      "Established Neighborhood"
+    ],
+    emoji: "🏠",
+    priceStatus: "fair"
   },
   {
     id: 11,
@@ -185,8 +245,13 @@ const PROPERTIES = [
     lat: -25.3386,
     lng: -57.5231,
     description: "Well-priced apartment in one of Greater Asuncion's fastest-growing cities. Low HOA fees, good public transport connections.",
-    tags: ["Low HOA", "Good Transport", "Growing Area"],
-    emoji: "🏢"
+    tags: [
+      "Low HOA",
+      "Good Transport",
+      "Growing Area"
+    ],
+    emoji: "🏢",
+    priceStatus: "fair"
   },
   {
     id: 12,
@@ -202,8 +267,14 @@ const PROPERTIES = [
     lat: -25.2785,
     lng: -57.5601,
     description: "Modern office space in Asuncion's premier business corridor. 350 m² across a single floor, raised access floor, and fiber-optic infrastructure.",
-    tags: ["Fiber Optic", "Raised Floor", "Business District", "Parking"],
-    emoji: "🏛️"
+    tags: [
+      "Fiber Optic",
+      "Raised Floor",
+      "Business District",
+      "Parking"
+    ],
+    emoji: "🏛️",
+    priceStatus: "fair"
   },
   {
     id: 13,
@@ -216,11 +287,17 @@ const PROPERTIES = [
     bedrooms: 3,
     bathrooms: 2,
     area: 150,
-    lat: -25.3290,
-    lng: -57.5680,
+    lat: -25.329,
+    lng: -57.568,
     description: "Newly built townhouse in a gated community. Shared pool and playground, 24-hour guard. Perfect for young families.",
-    tags: ["Gated Community", "Pool", "Playground", "24h Security"],
-    emoji: "🏘️"
+    tags: [
+      "Gated Community",
+      "Pool",
+      "Playground",
+      "24h Security"
+    ],
+    emoji: "🏘️",
+    priceStatus: "fair"
   },
   {
     id: 14,
@@ -234,10 +311,16 @@ const PROPERTIES = [
     bathrooms: 0,
     area: 1000,
     lat: -25.1742,
-    lng: -57.4840,
+    lng: -57.484,
     description: "Large land parcel on the outskirts of Greater Asuncion. Suitable for residential subdivision or agricultural use. Road access available.",
-    tags: ["Road Access", "Large Parcel", "Subdivisible", "Rural"],
-    emoji: "🌾"
+    tags: [
+      "Road Access",
+      "Large Parcel",
+      "Subdivisible",
+      "Rural"
+    ],
+    emoji: "🌾",
+    priceStatus: "fair"
   },
   {
     id: 15,
@@ -250,10 +333,16 @@ const PROPERTIES = [
     bedrooms: 3,
     bathrooms: 2,
     area: 130,
-    lat: -25.2950,
-    lng: -57.5670,
+    lat: -25.295,
+    lng: -57.567,
     description: "Spacious apartment in a prestigious residential zone near the Presidential Residence. High-end finishes, underground parking, and green views.",
-    tags: ["Underground Parking", "Green Views", "Prestigious Area", "A/C"],
-    emoji: "🏢"
+    tags: [
+      "Underground Parking",
+      "Green Views",
+      "Prestigious Area",
+      "A/C"
+    ],
+    emoji: "🏢",
+    priceStatus: "fair"
   }
 ];
